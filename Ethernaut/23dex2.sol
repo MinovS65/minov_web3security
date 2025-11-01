@@ -12,10 +12,8 @@ contract Hack {
         token1 = IERC20(dex.token1());
         token2 = IERC20(dex.token2());
         myToken = _myToken;
-        /*myToken.transfer(address(dex), 100);
-        myToken.approve(address(this), 1000000);
-        dex.approve(address(this), 1000000);
-        dex.approve(address(this), 1000000);*/
+        /*u need to manually approve 10000 things before u try the hack function below, look at the Gas Estimation Revert message when u try to call the hack function and look carefully to find the returned errror through the 
+        for it to work, in my case ive added MYTOKEN to the returns of some functions to debug easier*/
     }
 
     function hack() public {
