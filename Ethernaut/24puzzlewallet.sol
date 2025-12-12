@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 interface IWallet {
-    function owner() external returns(address);
+    function owner() external view returns(address);
     function maxBalance() external returns(uint);
     function whitelisted(address) external returns(bool);
     function balances(address) external returns(uint256);
@@ -14,7 +14,7 @@ interface IWallet {
     function multicall(bytes[] calldata data) external payable;
     
     function proposeNewAdmin(address _newAdmin) external;
-    function admin() external returns(address);
+    function admin() external view returns(address);
 }
 
 contract Hack {
