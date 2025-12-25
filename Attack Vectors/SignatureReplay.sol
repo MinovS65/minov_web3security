@@ -40,20 +40,24 @@ contract VulnerableMultiSig {
         owners = _owners;
     }
 
-    function deposit() public payable { require(msg.value>0)}
+    function deposit() public payable { require(msg.value>0); }
 
-    function transfer(address to, uint amount. bytes[2] memory sigs) public payable{
+    function transfer(address to, uint amount, bytes[2] memory sigs) public payable{
         bytes32 txHash = getTxHash(to, amount);
 
+        require(checkSigs(sigs,txHash), "invalid signatures");
+
+        (bool sent,) = to.call{value: amount}("");
+        require(sent, "call failed");
     }   
 
-    function getTxHash(address _to, uint256 _amount) public view returns (bytes32) {
+    function getTxHash(address _to, uint256 _amount) public pure returns (bytes32) {
         return keccak256(abi.encodePacked(_to, _amount));
     }
 
-    function checkSigs(bytes[2] memory sigs. bytes32 txHash) public view returns(bool) {
+    function checkSigs(bytes[2] memory sigs, bytes32 txHash) public view returns(bool) {
         bytes32 ethSignedHash = txHash.getEthSignedMessageHash();
-        for (int i;i<sigs.length;i++){
+        for (uint i;i<sigs.length;i++){
             address signer = ethSignedHash.recover(sigs[i]);
             if (signer != owners[i]) {
                 return false;
