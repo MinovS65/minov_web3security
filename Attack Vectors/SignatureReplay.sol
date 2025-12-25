@@ -66,3 +66,45 @@ contract VulnerableMultiSig {
         return true;
     }
 }
+
+contract SafeMutliSig {
+    using VerifySig for bytes32;
+
+    address[2] public owners;
+    mapping(bytes32=>bool) executed;
+
+    constructor(address[2] memory _owners) payable {
+        owners = _owners;
+    }
+
+    function deposit() public payable { require(msg.value>0); }
+
+    function transfer(address to, uint amount, bytes[2] memory sigs, uint nonce) public payable{
+        bytes32 txHash = getTxHash(to, amount, nonce);
+
+        require(!executed[txHash], "tx executed");
+        require(checkSigs(sigs,txHash), "invalid signatures");
+
+        executed[txHash] = true;
+        //we do it before the call so there is no reusing possible
+
+        (bool sent,) = to.call{value: amount}("");
+        require(sent, "call failed");
+    }   
+
+    //adding address(this) so there is no possibility of cross-contract reuse
+    function getTxHash(address _to, uint256 _amount, uint nonce) public view returns (bytes32) {
+        return keccak256(abi.encodePacked(address(this), _to, _amount, nonce));
+    }
+
+    function checkSigs(bytes[2] memory sigs, bytes32 txHash) public view returns(bool) {
+        bytes32 ethSignedHash = txHash.getEthSignedMessageHash();
+        for (uint i;i<sigs.length;i++){
+            address signer = ethSignedHash.recover(sigs[i]);
+            if (signer != owners[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
