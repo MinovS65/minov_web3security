@@ -82,3 +82,37 @@ contract Exploiter {
         }
     }
 }
+
+//to fix this we can put a lock for functions inside the vault
+contract Vault {
+    IERC20 public token;
+    mapping(address => uint256) public balances;
+    uint256 public totalShares;
+
+    bool _locked = false;
+    //im not writing a full vault contract for ts
+
+    modifier nonReentrant {
+        _locked = true;
+        _;
+        _locked = false;
+    }
+    
+    function withdraw(uint256 shares) public {
+        uint amount = (shares * token.balanceOf(address(this))) / totalShares;
+        _burn(msg.sender, shares);
+        token.transfer(msg.sender, amount);
+    }
+
+    function getSharePrice() external view returns (uint256) {
+        require(!_locked, "reentrancy");
+        return token.balanceOf(address(this)) * 1e18 / totalShares;
+    }
+
+    function _burn(address account,uint amount) internal {
+        require(account != address(0), "Burn from zero address");
+        require(balances[account] >= amount, "Burn amount exceeds balance");
+        balances[account] -= amount;
+        totalShares -= amount;
+    }
+}
