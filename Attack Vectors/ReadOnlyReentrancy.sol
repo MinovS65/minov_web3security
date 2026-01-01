@@ -39,7 +39,7 @@ contract VulnerableVault {
 
 contract Lender {
     VulnerableVault vault;
-    function basicBorrow(uint256 collateralShares) external {
+    function simpleBorrow(uint256 collateralShares) external {
         uint price = vault.getSharePrice();
 
         //a lot of checks have not been wrote as this is just an example for read only reentrancy
@@ -77,8 +77,8 @@ contract Exploiter {
             
             uint256 price = vault.getSharePrice();
             //the price is huge so we can lend more than we shouldve
-            
-            //lender.borrow(10000 usdc); - commented because i have not implemented usdc
+
+            //lender.simpleBorrow(10000 usdc); - commented because i have not implemented usdc
         }
     }
 }
