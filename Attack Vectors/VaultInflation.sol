@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
+import "forge-std/src/Test.sol";
 
 interface IERC20 {
     function totalSupply() external view returns(uint);
@@ -50,3 +51,6 @@ contract Vault {
     }
 }
 
+contract AttackPOC is Test {
+    
+}
