@@ -1,15 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 import "forge-std/src/Test.sol";
+import {Token} from "else/TokenERC20.sol";
+import {IERC20} from "interfaces/IERC20.sol";
 
-interface IERC20 {
-    function totalSupply() external view returns(uint);
-    function balanceOf(address account) external view returns (uint256);
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function approve(address spender, uint256 amount) external returns (bool);
-    function allowance(address owner, address spender) external view returns(uint);
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-}
 contract Vault {
     IERC20 token;
     uint256 totalSupply;
@@ -52,5 +46,21 @@ contract Vault {
 }
 
 contract AttackPOC is Test {
-    
+    Vault vault;
+    Token token; 
+
+    address[] private users = [address(11), address(12)];
+
+    function setUp () public {
+        token = new Token();
+        vault = new Vault();
+    }
+
+    function test() public {
+
+    }
+
+    function print() private {
+
+    }
 }
