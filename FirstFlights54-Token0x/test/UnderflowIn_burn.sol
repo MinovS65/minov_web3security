@@ -23,3 +23,20 @@ contract AttackPOC is Test {
         assertEq(token.totalSupply(sender),type(uint256).max);
     }
 }
+
+// FIX:
+/* add 
+    let supply := sload(supplySlot)
+
+    if lt(supply, value) { revert(0,0) } /ADD
+    sstore(supplySlot, sub(supply, value))
+
+    mstore(ptr, account)
+    mstore(add(ptr, 0x20), balanceSlot)
+
+    let accountBalanceSlot := keccak256(ptr, 0x40)
+
+    let accountBalance := sload(accountBalanceSlot)
+    if lt(accountBalance, value) { revert(0,0) } /ADD
+
+    sstore(accountBalanceSlot, sub(accountBalance, value)) */
