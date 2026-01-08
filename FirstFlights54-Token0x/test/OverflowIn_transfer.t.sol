@@ -70,3 +70,19 @@ contract AttackPOC is Test {
         assertEq(token._balanceOf(receiver),99);
     }
 }
+
+// FIX:
+/* add 
+    if lt(fromAmount, value) {
+        mstore(0x00, shl(224, 0xe450d38c))
+        mstore(add(0x00, 4), from)
+        mstore(add(0x00, 0x24), fromAmount)
+        mstore(add(0x00, 0x44), value)
+        revert(0x00, 0x64)
+    }
+
+    if gt(value, sub(not(0), toAmount)) { revert(0, 0) } /ADD
+    sstore(fromSlot, sub(fromAmount, value))
+    sstore(toSlot, add(toAmount, value))
+
+*/
